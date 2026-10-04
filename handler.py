@@ -1,7 +1,7 @@
 import runpod, os, subprocess, time
 
 MAX_MEDIA_BYTES = int(os.environ.get("MAX_MEDIA_BYTES", str(4 * 1024 * 1024 * 1024)))
-MODEL_NAME = os.environ.get("MODEL_NAME", "mel_band_roformer_kimberleyjensen_vocals.ckpt")
+MODEL_NAME = os.environ.get("MODEL_NAME", "vocals_mel_band_roformer.ckpt")
 MODEL_FILE_DIR = os.environ.get("MODEL_FILE_DIR", "/app/models")
 
 R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID", "")
