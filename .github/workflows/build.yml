@@ -24,6 +24,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/ber1205/vcd-separation:v5
+          tags: ghcr.io/ber1205/vcd-separation:v6
           cache-from: type=gha
           cache-to: type=gha,mode=max
