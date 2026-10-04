@@ -36,8 +36,11 @@ def _download(url: str, dst: str) -> int:
     return total
 
 
-def _ffmpeg(args: list) -> None:
-    subprocess.run(["ffmpeg", "-y", *args], check=True, capture_output=True)
+def _ffmpeg(args: list, label: str = "ffmpeg") -> None:
+    p = subprocess.run(["ffmpeg", "-y", *args], capture_output=True, text=True)
+    if p.returncode != 0:
+        tail = (p.stderr or "")[-300:].replace(chr(10), " | ")
+        raise RuntimeError(f"{label} exit {p.returncode}: {tail}")
 
 
 def _separate(audio_path: str, out_dir: str):
@@ -72,17 +75,17 @@ def handler(job):
         src = f"{work}/src.bin"
         size = _download(video_url, src)
         audio = f"{work}/audio_24k.wav"
-        _ffmpeg(["-i", src, "-vn", "-ac", "1", "-ar", "24000", audio])
+        _ffmpeg(["-i", src, "-vn", "-ac", "1", "-ar", "24000", audio], "extract-audio")
         vocal, bgm = _separate(audio, work + "/out")
         v24 = f"{work}/vocal_24k.wav"
-        _ffmpeg(["-i", vocal, "-ac", "1", "-ar", "24000", v24])
+        _ffmpeg(["-i", vocal, "-ac", "1", "-ar", "24000", v24], "resample-vocal")
         s3 = _s3_client()
         vocal_bytes = os.path.getsize(v24)
         s3.upload_file(v24, R2_BUCKET, vocal_key, ExtraArgs={"ContentType": "audio/wav"})
         bgm_bytes = 0
         if bgm and bgm_key:
             b24 = f"{work}/bgm_24k.wav"
-            _ffmpeg(["-i", bgm, "-ac", "1", "-ar", "24000", b24])
+            _ffmpeg(["-i", bgm, "-ac", "1", "-ar", "24000", b24], "resample-bgm")
             bgm_bytes = os.path.getsize(b24)
             s3.upload_file(b24, R2_BUCKET, bgm_key, ExtraArgs={"ContentType": "audio/wav"})
         took = int((time.time() - t0) * 1000)
