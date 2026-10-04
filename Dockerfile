@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir "audio-separator[gpu]" runpod boto3 requests
 
 COPY handler.py /app/handler.py
 
-ARG MODEL_NAME=mel_band_roformer_kimberleyjensen_vocals.ckpt
+ARG MODEL_NAME=vocals_mel_band_roformer.ckpt
 ENV MODEL_FILE_DIR=/app/models \
     MODEL_NAME=${MODEL_NAME}
 
