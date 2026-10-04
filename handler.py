@@ -57,7 +57,7 @@ def _separate(audio_path: str, out_dir: str):
             vocal = os.path.join(out_dir, f)
     if not vocal:
         raise RuntimeError(f"separation produced no vocal stem: {files}")
-    return vocal, bgm
+    return vocal, bgm, files
 
 
 def handler(job):
@@ -76,7 +76,7 @@ def handler(job):
         size = _download(video_url, src)
         audio = f"{work}/audio_24k.wav"
         _ffmpeg(["-i", src, "-vn", "-ac", "1", "-ar", "24000", audio], "extract-audio")
-        vocal, bgm = _separate(audio, work + "/out")
+        vocal, bgm, sep_files = _separate(audio, work + "/out")
         v24 = f"{work}/vocal_24k.wav"
         _ffmpeg(["-i", vocal, "-ac", "1", "-ar", "24000", v24], "resample-vocal")
         s3 = _s3_client()
@@ -94,7 +94,7 @@ def handler(job):
             "vocalKey": vocal_key,
             "bgmKey": bgm_key if (bgm and bgm_key) else None,
             "vocalBytes": vocal_bytes, "bgmBytes": bgm_bytes,
-            "mediaBytes": size, "tookMs": took,
+            "mediaBytes": size, "tookMs": took, "sepFiles": sep_files,
         }
     except Exception as e:
         return {"ok": False, "error": f"{type(e).__name__}: {e}"[:500], "jobId": job_id}
