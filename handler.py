@@ -51,10 +51,10 @@ def _separate(audio_path: str, out_dir: str):
     vocal = bgm = None
     for f in files:
         low = f.lower()
-        if "vocal" in low and not vocal:
-            vocal = os.path.join(out_dir, f)
-        elif ("instrumental" in low or "accompaniment" in low or "bgm" in low) and not bgm:
+        if ("no_vocals" in low or "instrumental" in low or "accompaniment" in low or "off_vocal" in low or "bgm" in low) and not bgm:
             bgm = os.path.join(out_dir, f)
+        elif "vocal" in low and not vocal:
+            vocal = os.path.join(out_dir, f)
     if not vocal:
         raise RuntimeError(f"separation produced no vocal stem: {files}")
     return vocal, bgm
