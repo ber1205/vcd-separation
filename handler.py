@@ -51,7 +51,7 @@ def _separate(audio_path: str, out_dir: str):
     vocal = bgm = None
     for f in files:
         low = f.lower()
-        if ("no_vocals" in low or "instrumental" in low or "accompaniment" in low or "off_vocal" in low or "bgm" in low) and not bgm:
+        if ("no_vocals" in low or "instrumental" in low or "accompaniment" in low or "off_vocal" in low or "bgm" in low or "(other)" in low) and not bgm:
             bgm = os.path.join(out_dir, f)
         elif "vocal" in low and not vocal:
             vocal = os.path.join(out_dir, f)
